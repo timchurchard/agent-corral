@@ -67,6 +67,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "provision/07-neovim.sh"
   config.vm.provision "shell", path: "provision/08-chrome.sh"
   config.vm.provision "shell", path: "provision/09-default-config.sh"
+  config.vm.provision "shell", path: "provision/10-default-bashrc.sh"
 
   machines.each do |name, m|
     box = m["box"] || cfg.fetch("box", "debian/trixie64")
