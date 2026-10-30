@@ -15,4 +15,5 @@ apt-get install -y \
   tmux \
   zstd \
   htop \
+  rsync \
   build-essential

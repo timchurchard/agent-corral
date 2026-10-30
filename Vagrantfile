@@ -54,4 +54,6 @@ Vagrant.configure("2") do |config|
   # Runs as the vagrant user: herdr installs into ~/.local/bin
   config.vm.provision "shell", path: "provision/06-herdr.sh", privileged: false
   config.vm.provision "shell", path: "provision/07-neovim.sh"
+  config.vm.provision "shell", path: "provision/08-chrome.sh"
+  config.vm.provision "shell", path: "provision/09-default-config.sh"
 end

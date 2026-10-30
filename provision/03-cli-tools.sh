@@ -43,3 +43,8 @@ su - vagrant -c '
 if ! command -v ollama >/dev/null 2>&1; then
   curl -fsSL https://ollama.com/install.sh | sh
 fi
+
+# gh CLI -- backs the git credential helper in 09-default-config.sh
+if ! command -v gh >/dev/null 2>&1; then
+  apt-get install -y gh
+fi

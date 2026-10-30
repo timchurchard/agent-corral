@@ -16,5 +16,6 @@ if ! command -v nvim >/dev/null 2>&1 || [[ "$(nvim --version 2>/dev/null | head 
   tar -C /opt -xzf "$tmp_dir/nvim.tar.gz"
   mv /opt/nvim-linux-x86_64 /opt/nvim
   ln -sf /opt/nvim/bin/nvim /usr/local/bin/nvim
+  ln -sf /opt/nvim/bin/nvim /usr/local/bin/vim
   rm -rf "$tmp_dir"
 fi

@@ -85,14 +85,37 @@ touching the shared Vagrantfile.
 
 ## Post-`vagrant up` manual steps (not scripted — personal/secret)
 
+Most of these run straight from the host with `vagrant ssh -c` — no need
+to enter an interactive session:
+
 ```sh
-vagrant ssh
+vagrant ssh -c "git config --global user.name '...'"
+vagrant ssh -c "git config --global user.email '...'"
+vagrant ssh -c "vncpasswd"
 ```
 
-- `git config --global user.name ...` / `user.email ...`
-- `claude` — log in on first run
-- `vncpasswd` — set a VNC password before starting the desktop:
-  `sudo systemctl enable --now vncserver@:1`
+The VNC password is the one manual gate on the desktop: the `vncserver@:1`
+unit is installed but deliberately not enabled until it's set. Start the
+desktop once it's done:
+
+```sh
+vagrant ssh -c "sudo systemctl enable --now vncserver@:1"
+```
+
+A few steps do need a real interactive session — open one with
+`vagrant ssh`:
+
+- `claude` — log in on first run (needs its interactive prompt/TUI).
+- Authorize a host SSH key on the VM — needed for `ssh vagrant@<vm-ip>`
+  (the VNC tunnel further down), `ssh devbox` if you set up that SSH
+  alias, and `hc machine add`. `ssh-copy-id` against the VM has to be
+  pointed at the per-machine Vagrant key under `.vagrant/machines/...`,
+  which is easy to fumble — piping through vagrant sidesteps it:
+
+  ```sh
+  cat ~/.ssh/<your-key>.pub | vagrant ssh -c \
+    "mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+  ```
 - Personal credentials aren't provisioned. For git pushes from inside the
   VM use agent forwarding, opt in per session with the destination scoped —
   no private key ever lands on the guest, and the forwarded agent refuses
@@ -121,7 +144,9 @@ ssh -L 9090:localhost:9090 <user>@<physical-host>
 Use the actual desktop (browser, GUI IDE) inside the VM via VNC. The server
 binds to localhost inside the guest only, so connect through an SSH tunnel
 to the VM itself — from the physical host, or with `-J` from anywhere
-further away (VNC traffic stays inside the tunnel):
+further away (VNC traffic stays inside the tunnel). The `vagrant@`
+connection needs one of your keys authorized on the VM
+(`vagrant ssh -c` one-liner in the manual steps above):
 
 ```sh
 ssh -L 5901:localhost:5901 vagrant@192.168.121.10
