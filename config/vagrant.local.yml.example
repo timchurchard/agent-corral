@@ -1,0 +1,19 @@
+# Copy this file to vagrant.local.yml (gitignored) and edit for this
+# specific physical machine. Every key has a fallback in the Vagrantfile,
+# so you only need to set the ones you want to change.
+
+# Pin an exact version so multiple physical machines provision the same OS
+# build instead of whatever is newest on the day. Look up current versions
+# at https://app.vagrantup.com/debian/boxes/trixie64 and set it here.
+box: debian/trixie64
+box_version: "CHANGE_ME"
+
+hostname: devbox
+
+# Static IP on the libvirt private/NAT network. Keep this stable per machine
+# so SSH tunnels to VNC don't need updating after a reboot.
+ip: 192.168.121.10
+
+vcpus: 4
+memory_mb: 8192
+disk_gb: 80
