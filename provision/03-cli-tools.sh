@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# AWS CLI v2
-if ! command -v aws >/dev/null 2>&1; then
+# AWS CLI v2 (pinned version + sha256 of the linux-x86_64 zip)
+AWSCLI_VERSION=2.39.2
+AWSCLI_SHA256=bb3e675d5c9a915121f3f90b380ec041ba52517067d017e4a4ceba40e0213247
+if ! command -v aws >/dev/null 2>&1 || [[ "$(aws --version 2>/dev/null)" != "aws-cli/${AWSCLI_VERSION}"* ]]; then
   tmp_dir=$(mktemp -d)
-  curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "$tmp_dir/awscliv2.zip"
+  curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWSCLI_VERSION}.zip" -o "$tmp_dir/awscliv2.zip"
+  echo "${AWSCLI_SHA256}  $tmp_dir/awscliv2.zip" | sha256sum -c -
   unzip -q "$tmp_dir/awscliv2.zip" -d "$tmp_dir"
-  "$tmp_dir/aws/install"
+  "$tmp_dir/aws/install" --update
   rm -rf "$tmp_dir"
 fi
 

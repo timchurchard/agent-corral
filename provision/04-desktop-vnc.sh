@@ -30,7 +30,7 @@ WorkingDirectory=/home/vagrant
 
 PIDFile=/home/vagrant/.vnc/%H%i.pid
 ExecStartPre=-/usr/bin/vncserver -kill %i > /dev/null 2>&1
-ExecStart=/usr/bin/vncserver -localhost no -depth 24 -geometry 1920x1080 %i
+ExecStart=/usr/bin/vncserver -depth 24 -geometry 1920x1080 %i
 ExecStop=/usr/bin/vncserver -kill %i
 
 [Install]

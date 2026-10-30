@@ -33,9 +33,11 @@ Vagrant.configure("2") do |config|
 
   config.vm.network "private_network", ip: cfg.fetch("ip", "192.168.121.10")
 
-  # Lets git/GitHub inside the guest use the host's SSH agent/keys directly --
-  # no private key ever needs to live on the guest disk.
-  config.ssh.forward_agent = true
+  # Agent forwarding is OFF by default (a guest can't use host keys unless
+  # you ask for it). Opt in per session for git pushes:
+  #   vagrant ssh -- -A
+  # and see README.md's SSH agent forwarding note for scoping the
+  # forwarded agent to specific hosts (PermitRemoteOpen).
 
   config.vm.provider :libvirt do |lv|
     lv.cpus = cfg.fetch("vcpus", 8)

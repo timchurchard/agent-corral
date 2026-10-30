@@ -22,7 +22,7 @@ There is no build/test/lint tooling — verification is the README's checklist (
 
 ## Key structure
 
-- `Vagrantfile` — reads `config/vagrant.local.yml`, fails with a clear message if it's missing. All keys have fallbacks, so the yml only overrides box version, hostname, static IP, vcpus/memory/disk. No synced folder by design (work lives on the VM's own disk); SSH agent forwarding is on deliberately so guest git uses host keys and no private key lands on the guest.
+- `Vagrantfile` — reads `config/vagrant.local.yml`, fails with a clear message if it's missing. All keys have fallbacks, so the yml only overrides box version, hostname, static IP, vcpus/memory/disk. No synced folder by design (work lives on the VM's own disk). SSH agent forwarding is off by default; opt in per session with `vagrant ssh -- -A` so guest git can use host keys without a private key landing on the guest — see the README's SSH agent forwarding note.
 - `config/vagrant.local.yml` — **gitignored on purpose**. Each physical machine keeps its own copy (resource sizing + static IP differ per machine). Copy from `config/vagrant.local.yml.example`. Never generate or commit this file; `box_version` must be pinned to a concrete version, not left as `CHANGE_ME`.
 - `provision/01-base.sh … 04-desktop-vnc.sh` — run in filename order on every provision. They use `set -euo pipefail` and guard installs with `command -v` checks, so they stay idempotent across re-provisions — keep new scripts that way.
 

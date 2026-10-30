@@ -93,8 +93,18 @@ vagrant ssh
 - `claude` — log in on first run
 - `vncpasswd` — set a VNC password before starting the desktop:
   `sudo systemctl enable --now vncserver@:1`
-- Personal credentials aren't provisioned. `vagrant ssh` on itself already
-  uses SSH agent forwarding, so git over SSH works with no key on the guest.
+- Personal credentials aren't provisioned. For git pushes from inside the
+  VM use agent forwarding, opt in per session with the destination scoped —
+  no private key ever lands on the guest, and the forwarded agent refuses
+  to sign for anything but GitHub:
+
+  ```sh
+  vagrant ssh -- -A -o PermitRemoteOpen=github.com:22
+  ```
+
+  (Vagrant runs ssh with its own config file, so scoping goes on the
+  command line, not `~/.ssh/config` — for plain `ssh devbox` sessions a
+  `Match` block in `~/.ssh/config` works the same way.)
   For anything else you may want to copy material in manually, e.g.
   `rsync ~/.aws/` or a `~/.ssh/id_whatever_key` into the VM (then
   `chmod 600` inside it), or run `gh auth login` / `aws sso login` there.
@@ -108,19 +118,17 @@ ssh -L 9090:localhost:9090 <user>@<physical-host>
 # then open https://localhost:9090 locally
 ```
 
-Use the actual desktop (browser, GUI IDE) inside the VM via VNC, tunneled
-through the same host (replace with the VM's static IP from
-`vagrant.local.yml`):
+Use the actual desktop (browser, GUI IDE) inside the VM via VNC. The server
+binds to localhost inside the guest only, so connect through an SSH tunnel
+to the VM itself — from the physical host, or with `-J` from anywhere
+further away (VNC traffic stays inside the tunnel):
 
 ```sh
-ssh -L 5901:192.168.121.10:5901 <user>@<physical-host>
+ssh -L 5901:localhost:5901 vagrant@192.168.121.10
+# from a remote machine, jump via the physical host:
+ssh -J <user>@<physical-host> -L 5901:localhost:5901 vagrant@192.168.121.10
 # then point a VNC client at localhost:5901
 ```
-
-From the physical host itself no tunnel is needed — point the VNC client
-straight at the VM (VNC syntax uses `::` for the port, e.g.
-`192.168.121.10::5901`). The VM sits on libvirt's private NAT network, so
-this stays unreachable from outside the host.
 
 ## Herdr cheat sheet
 
