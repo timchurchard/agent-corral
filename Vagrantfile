@@ -68,6 +68,9 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", path: "provision/08-chrome.sh"
   config.vm.provision "shell", path: "provision/09-default-config.sh"
   config.vm.provision "shell", path: "provision/10-default-bashrc.sh"
+  # Runs as the vagrant user: skills clone into ~vagrant/src and link into
+  # ~/.claude/skills
+  config.vm.provision "shell", path: "provision/11-skills.sh", privileged: false
 
   machines.each do |name, m|
     box = m["box"] || cfg.fetch("box", "debian/trixie64")
