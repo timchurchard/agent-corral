@@ -11,7 +11,8 @@ SKILLS_URL=https://github.com/timchurchard/skills
 SKILLS_SRC=$HOME/src/skills
 
 if [ -d "$SKILLS_SRC/.git" ]; then
-  git -C "$SKILLS_SRC" pull --ff-only >/dev/null 2>&1 || true
+  git -C "$SKILLS_SRC" pull --ff-only >/dev/null 2>&1 ||
+    echo "warning: skills pull failed (offline? rebase needed?) -- using existing clone" >&2
 else
   mkdir -p "$(dirname "$SKILLS_SRC")"
   GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null \
@@ -19,9 +20,11 @@ else
 fi
 
 SKILL_DIR="$SKILLS_SRC/skills"
-[ -d "$SKILL_DIR" ] || SKILL_DIR=$SKILLS_SRC
+[ -d "$SKILL_DIR" ] ||
+  { echo "warning: $SKILLS_SRC has no skills/ dir -- not linking anything" >&2; exit 0; }
 mkdir -p "$HOME/.claude/skills"
 for dir in "$SKILL_DIR"/*/; do
   [ -f "$dir/SKILL.md" ] || continue
   ln -sfn "$dir" "$HOME/.claude/skills/$(basename "$dir")"
+  echo "skill linked: $(basename "$dir")"
 done
