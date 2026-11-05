@@ -13,15 +13,18 @@ if ! command -v aws >/dev/null 2>&1 || [[ "$(aws --version 2>/dev/null)" != "aws
   rm -rf "$tmp_dir"
 fi
 
-# Node.js (LTS) -- needed to install the Claude Code CLI via npm
+# Node.js (LTS)
 if ! command -v node >/dev/null 2>&1; then
   curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
   apt-get install -y nodejs
 fi
 
-# Claude Code CLI
-if ! command -v claude >/dev/null 2>&1; then
-  npm install -g @anthropic-ai/claude-code
+# Claude Code CLI -- native per-user install, replacing the legacy npm package
+if npm list -g @anthropic-ai/claude-code >/dev/null 2>&1; then
+  npm uninstall -g @anthropic-ai/claude-code
+fi
+if [ ! -x /home/vagrant/.local/bin/claude ]; then
+  su - vagrant -c "curl -fsSL https://claude.ai/install.sh | bash"
 fi
 
 # nono sandbox (pinned version + sha256 of the linux-x86_64 archive)
