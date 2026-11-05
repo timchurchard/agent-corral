@@ -155,6 +155,23 @@ ssh -J <user>@<physical-host> -L 5901:localhost:5901 vagrant@192.168.121.10
 # then point a VNC client at localhost:5901
 ```
 
+## Host-side helper scripts
+
+`scripts/10-snapshot.sh` is a host-side convenience (not part of
+provisioning). Run it from a checkout of this repo:
+
+```sh
+scripts/10-snapshot.sh create <snap-name>   # VM halted (it refuses if up)
+scripts/10-snapshot.sh list                 # or .revert / .copy
+scripts/10-snapshot.sh revert <snap-name>
+scripts/10-snapshot.sh copy <user>@<target-host>   # halts, copies the disk
+```
+
+The copy carries internal snapshots along (they live inside the qcow2),
+defines the domain on the target as-is (same name/UUID/MAC — only one
+clone may run at a time), and prints the two commands that make Vagrant
+adopt it there.
+
 ## Herdr cheat sheet
 
 Installed by provision `06-herdr.sh` (runs as `vagrant`): `herdr-app` and

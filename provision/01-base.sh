@@ -13,7 +13,12 @@ apt-get install -y \
   jq \
   git \
   tmux \
+  zsh \
   zstd \
   htop \
   rsync \
+  bubblewrap \
+  socat \
+  ripgrep \
+  seccomp \
   build-essential

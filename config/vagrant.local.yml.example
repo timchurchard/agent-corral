@@ -17,3 +17,23 @@ ip: 192.168.121.10
 vcpus: 4
 memory_mb: 8192
 disk_gb: 80
+
+# Several VMs from this one Vagrantfile (separate work machines, e.g. paid
+# vs open-source): list them under `machines:` instead. Each needs its own
+# `ip` (they share libvirt's private NAT network) and `hostname` (it doubles
+# as the libvirt domain name). Sizing keys fall back to the top-level ones.
+# Up/down/ssh target a single one with its name: `vagrant up paid`.
+#
+# machines:
+#   oss:
+#     hostname: devbox-oss
+#     ip: 192.168.121.10
+#     vcpus: 4
+#     memory_mb: 8192
+#     disk_gb: 80
+#   paid:
+#     hostname: devbox-paid
+#     ip: 192.168.121.11
+#     vcpus: 8
+#     memory_mb: 16384
+#     disk_gb: 128

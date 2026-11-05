@@ -19,3 +19,15 @@ if ! command -v nvim >/dev/null 2>&1 || [[ "$(nvim --version 2>/dev/null | head 
   ln -sf /opt/nvim/bin/nvim /usr/local/bin/vim
   rm -rf "$tmp_dir"
 fi
+
+# tree-sitter CLI -- nvim-treesitter main needs 0.26.1+, newer than Debian's
+TREE_SITTER_VERSION=0.27.1
+TREE_SITTER_SHA256=d01042f94ba3d6827ddc9788e235f75d8366431be42bdf90ade534d960c98b7d
+if ! command -v tree-sitter >/dev/null 2>&1 || [[ "$(tree-sitter --version 2>/dev/null)" != *"${TREE_SITTER_VERSION}"* ]]; then
+  tmp_dir=$(mktemp -d)
+  curl -fsSL "https://github.com/tree-sitter/tree-sitter/releases/download/v${TREE_SITTER_VERSION}/tree-sitter-linux-x64.gz" -o "$tmp_dir/tree-sitter.gz"
+  echo "${TREE_SITTER_SHA256}  $tmp_dir/tree-sitter.gz" | sha256sum -c -
+  gzip -dc "$tmp_dir/tree-sitter.gz" > "$tmp_dir/tree-sitter"
+  install -m 0755 "$tmp_dir/tree-sitter" /usr/local/bin/tree-sitter
+  rm -rf "$tmp_dir"
+fi
