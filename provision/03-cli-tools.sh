@@ -24,6 +24,18 @@ if ! command -v claude >/dev/null 2>&1; then
   npm install -g @anthropic-ai/claude-code
 fi
 
+# nono sandbox (pinned version + sha256 of the linux-x86_64 archive)
+NONO_VERSION=0.81.0
+NONO_SHA256=7ecc33ff9c349bdfa84b4496e7a7555f67bcc33f1e125c7df9efb653c6c4e569
+if ! command -v nono >/dev/null 2>&1 || [[ "$(nono --version 2>/dev/null)" != *"${NONO_VERSION}"* ]]; then
+  tmp_dir=$(mktemp -d)
+  curl -fsSL "https://github.com/nolabs-ai/nono/releases/download/v${NONO_VERSION}/nono-v${NONO_VERSION}-x86_64-unknown-linux-gnu.tar.gz" -o "$tmp_dir/nono.tar.gz"
+  echo "${NONO_SHA256}  $tmp_dir/nono.tar.gz" | sha256sum -c -
+  tar -xzf "$tmp_dir/nono.tar.gz" -C "$tmp_dir"
+  install -m 0755 "$tmp_dir/nono" /usr/local/bin/nono
+  rm -rf "$tmp_dir"
+fi
+
 # nvm (per-user, ~vagrant) -- LTS Node for interactive shells, npx, skills.
 # Must run as the vagrant user since nvm installs into $HOME/.nvm; su (as
 # root) needs no sudo. Provisioning itself keeps using the system Node/npm
