@@ -13,16 +13,32 @@ if ! command -v aws >/dev/null 2>&1 || [[ "$(aws --version 2>/dev/null)" != "aws
   rm -rf "$tmp_dir"
 fi
 
-# Node.js (LTS) -- needed to install the Claude Code CLI via npm
+# Node.js (LTS)
 if ! command -v node >/dev/null 2>&1; then
   curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
   apt-get install -y nodejs
 fi
 
-# Claude Code CLI
-if ! command -v claude >/dev/null 2>&1; then
-  npm install -g @anthropic-ai/claude-code
+# Claude Code CLI -- pinned native per-user install, replacing the npm package
+CLAUDE_VERSION=2.1.318
+CLAUDE_SHA256=708c77b204db30086ff6f1ed34577bda03e1be74ced80557cbf7b54249ebf0bd
+CLAUDE_ZST_SHA256=760aaca865c68a315e49d129614a5f5dc9cab99f7de75899257faed68f553f3b
+claude_bin="/home/vagrant/.local/share/claude/versions/${CLAUDE_VERSION}"
+if npm list -g @anthropic-ai/claude-code >/dev/null 2>&1; then
+  npm uninstall -g @anthropic-ai/claude-code
 fi
+install -d -o vagrant -g vagrant -m 0755 \
+  /home/vagrant/.local/bin "/home/vagrant/.local/share/claude/versions"
+if [ ! -x "$claude_bin" ]; then
+  tmp_dir=$(mktemp -d)
+  curl -fsSL "https://downloads.claude.ai/claude-code-releases/${CLAUDE_VERSION}/linux-x64/claude.zst" -o "$tmp_dir/claude.zst"
+  echo "${CLAUDE_ZST_SHA256}  $tmp_dir/claude.zst" | sha256sum -c -
+  zstd -d -q -c "$tmp_dir/claude.zst" > "$tmp_dir/claude"
+  echo "${CLAUDE_SHA256}  $tmp_dir/claude" | sha256sum -c -
+  install -o vagrant -g vagrant -m 0755 "$tmp_dir/claude" "$claude_bin"
+  rm -rf "$tmp_dir"
+fi
+ln -sfn "$claude_bin" /home/vagrant/.local/bin/claude
 
 # nono sandbox (pinned version + sha256 of the linux-x86_64 archive)
 NONO_VERSION=0.81.0
